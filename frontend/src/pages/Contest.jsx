@@ -26,13 +26,13 @@ export default function Contest() {
     socket.connect();
 
     // Fetch questions
-    axios.get('http://localhost:1557/questions').then(res => {
+    axios.get('https://kbc-3-0-csss.onrender.com/questions').then(res => {
       setQuestions(res.data);
     });
 
     // Fetch participant status to restore session
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:1557/participant/${participantId}`, {
+    axios.get(`https://kbc-3-0-csss.onrender.com/participant/${participantId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       const history = {};

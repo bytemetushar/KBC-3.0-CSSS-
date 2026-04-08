@@ -19,7 +19,7 @@ export default function Admin() {
       verifyKey(storedKey);
     }
 
-    axios.get('http://localhost:1557/questions').then(res => {
+    axios.get('https://kbc-3-0-csss.onrender.com/questions').then(res => {
       setQuestions(res.data);
     });
 
@@ -41,7 +41,7 @@ export default function Admin() {
   const verifyKey = async (inputKey) => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:1557/admin/verify', { key: inputKey });
+      const res = await axios.post('https://kbc-3-0-csss.onrender.com/admin/verify', { key: inputKey });
       if (res.data.success) {
         setIsAdmin(true);
         localStorage.setItem('adminKey', inputKey);

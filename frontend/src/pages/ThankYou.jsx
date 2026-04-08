@@ -17,7 +17,7 @@ export default function ThankYou() {
 
     // Fetch final score one last time
     const token = localStorage.getItem('token');
-    axios.get(`http://localhost:1557/participant/${participantId}`, {
+    axios.get(`https://kbc-3-0-csss.onrender.com/participant/${participantId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       setScore(res.data.score);

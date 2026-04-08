@@ -14,7 +14,7 @@ export default function Login() {
     if(!teamId || !teamName) return;
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:1557/register', { id: teamId, name: teamName });
+      const response = await axios.post('https://kbc-3-0-csss.onrender.com/register', { id: teamId, name: teamName });
       const { token } = response.data;
       localStorage.setItem('participantId', teamId);
       localStorage.setItem('participantName', teamName);
