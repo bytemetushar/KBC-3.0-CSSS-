@@ -9,6 +9,8 @@ export default function Contest() {
   const [currentQIdx, setCurrentQIdx] = useState(0);
   const [answer, setAnswer] = useState('');
   const [results, setResults] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
   const navigate = useNavigate();
 
   const participantId = localStorage.getItem('participantId');
@@ -23,8 +25,33 @@ export default function Contest() {
     // Connect socket
     socket.connect();
 
-    axios.get('http://localhost:3001/questions').then(res => {
+    // Fetch questions
+    axios.get('http://localhost:1557/questions').then(res => {
       setQuestions(res.data);
+    });
+
+    // Fetch participant status to restore session
+    const token = localStorage.getItem('token');
+    axios.get(`http://localhost:1557/participant/${participantId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => {
+      const history = {};
+      if (res.data.answers) {
+        res.data.answers.forEach(ans => {
+          history[ans.questionId] = {
+            status: ans.status,
+            scoreAdd: ans.status === 'correct' ? 10 : 0
+          };
+        });
+      }
+      setResults(history);
+    }).catch(err => {
+      console.error("Failed to fetch participant history", err);
+      if (err.response && err.response.status === 404) {
+        localStorage.removeItem('participantId');
+        localStorage.removeItem('participantName');
+        navigate('/');
+      }
     });
 
     socket.on('answer_result', (data) => {
@@ -38,19 +65,75 @@ export default function Contest() {
       }));
     });
 
+    // Listen for Admin's Next Question broadcast
+    socket.on('question_update', (data) => {
+      console.log("Admin pushed next question:", data.currentQIdx);
+      setCurrentQIdx(data.currentQIdx);
+    });
+
+    // Handle initial question index from server
+    socket.on('init_active_question', (data) => {
+      if (!isInitialized) {
+        console.log("Setting initial question from server:", data.currentQIdx);
+        setCurrentQIdx(data.currentQIdx);
+        setIsInitialized(true);
+      }
+    });
+
     return () => {
       socket.off('answer_result');
+      socket.off('question_update');
+      socket.off('init_active_question');
       socket.disconnect();
     }
-  }, [participantId, navigate]);
+  }, [participantId, navigate, isInitialized]);
 
-  const submitAnswer = () => {
-    if(!answer.trim()) return;
+  // Check for completion
+  useEffect(() => {
+    if (questions.length > 0 && results[questions[questions.length - 1]?.id]) {
+       // Added a small delay for a smoother transition
+       const timer = setTimeout(() => {
+         navigate('/thank-you');
+       }, 2000);
+       return () => clearTimeout(timer);
+    }
+  }, [results, questions, navigate]);
+
+  // Removed: initial question index calculation based on history
+  // The Admin now controls which question is active for everyone globally.
+
+  // Question Timer Logic
+  useEffect(() => {
+    const qId = questions[currentQIdx]?.id;
+    // Only run timer if not already answered and not on completed state
+    if (questions.length > 0 && !results[qId]) {
+      setTimeLeft(30); // Reset timer for new question
+      
+      const interval = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            // Auto-submit on timeout
+            submitAnswer("TIMEOUT");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [currentQIdx, questions.length, results]); // Added results to dependencies to clear timer on answer
+
+  const submitAnswer = (timeoutVal) => {
+    const currentAnswer = timeoutVal === "TIMEOUT" ? "TIMEOUT" : answer;
+    if(!currentAnswer.trim() && timeoutVal !== "TIMEOUT") return;
+    
     const q = questions[currentQIdx];
     socket.emit('submit_answer', {
       participantId,
       questionId: q.id,
-      answer
+      answer: currentAnswer
     });
     setAnswer('');
   };
@@ -73,15 +156,42 @@ export default function Contest() {
           <h2 style={{ margin: 0, color: 'var(--primary)' }}>KBC: Round 1</h2>
           <span style={{ color: 'var(--text-muted)' }}>Participant: {participantName}</span>
         </div>
-        <div className="neo-panel" style={{ padding: '0.5rem 1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-           <span>Score:</span> 
-           <strong style={{ color: 'var(--secondary)', fontSize: '1.2rem' }}>
-             {Object.values(results).reduce((acc, curr) => acc + (curr.scoreAdd || 0), 0)}
-           </strong>
+        <div className="neo-panel" style={{ padding: '0.5rem 1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingRight: '1rem', borderRight: '1px solid var(--border-color)' }}>
+              <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>TIME:</span>
+              <strong style={{ 
+                color: timeLeft <= 10 ? 'var(--danger)' : 'var(--primary)', 
+                fontSize: '1.2rem',
+                minWidth: '2ch',
+                textAlign: 'right',
+                animation: timeLeft <= 5 ? 'pulse 0.5s infinite' : 'none'
+              }}>
+                {timeLeft}s
+              </strong>
+           </div>
+           <div>
+            <span>Score:</span> 
+            <strong style={{ color: 'var(--secondary)', fontSize: '1.2rem', marginLeft: '0.5rem' }}>
+              {Object.values(results).reduce((acc, curr) => acc + (curr.scoreAdd || 0), 0)}
+            </strong>
+           </div>
         </div>
       </header>
 
-      <div className="neo-panel" style={{ overflow: 'hidden' }}>
+      <div className="neo-panel" style={{ overflow: 'hidden', position: 'relative' }}>
+        {/* Timer Progress Bar */}
+        {!qResult && (
+          <div style={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            height: '4px', 
+            background: timeLeft <= 10 ? 'var(--danger)' : 'var(--primary)',
+            width: `${(timeLeft / 30) * 100}%`,
+            transition: 'width 1s linear, background 0.3s'
+          }} />
+        )}
+        
         <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(0,0,0,0.2)' }}>
           <Code color="var(--primary)" />
           <h3 style={{ margin: 0 }}>Question {currentQIdx + 1} of {questions.length}: {q.title}</h3>
@@ -130,14 +240,10 @@ export default function Contest() {
           </div>
         </div>
         
-        <div style={{ padding: '1rem 2rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end', background: 'rgba(0,0,0,0.2)' }}>
-           <button 
-             className="neo-button" 
-             onClick={nextQuestion} 
-             disabled={currentQIdx >= questions.length - 1}
-           >
-             Next Question
-           </button>
+        <div style={{ padding: '1rem 2rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'center', background: 'rgba(0,0,0,0.2)' }}>
+           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontStyle: 'italic' }}>
+             Waiting for admin to push the next question...
+           </p>
         </div>
       </div>
     </div>

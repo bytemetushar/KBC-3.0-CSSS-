@@ -14,9 +14,11 @@ export default function Login() {
     if(!teamId || !teamName) return;
     setLoading(true);
     try {
-      await axios.post('http://localhost:3001/register', { id: teamId, name: teamName });
+      const response = await axios.post('http://localhost:1557/register', { id: teamId, name: teamName });
+      const { token } = response.data;
       localStorage.setItem('participantId', teamId);
       localStorage.setItem('participantName', teamName);
+      localStorage.setItem('token', token);
       navigate('/contest');
     } catch(err) {
       alert("Error connecting to server. Is it running?");
@@ -29,7 +31,7 @@ export default function Login() {
       <div className="neo-panel" style={{ padding: '2rem', textAlign: 'center' }}>
         <Terminal size={48} color="var(--primary)" style={{ marginBottom: '1rem' }} />
         <h1 style={{ margin: '0 0 0.5rem 0', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '2px' }}>
-          Kaun Banega Coder
+          Kaun Banega Coder 3.0
         </h1>
         <p style={{ margin: '0 0 2rem 0', color: 'var(--text-muted)' }}>Round 1: Code Chronicles</p>
         

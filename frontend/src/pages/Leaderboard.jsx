@@ -8,7 +8,7 @@ export default function Leaderboard() {
 
   useEffect(() => {
     // Initial fetch
-    axios.get('http://localhost:3001/leaderboard').then(res => {
+    axios.get('http://localhost:1557/leaderboard').then(res => {
       setLeaders(res.data);
     });
 
@@ -66,7 +66,11 @@ export default function Leaderboard() {
                 <div style={{ flex: 1, fontSize: '1.2rem', fontWeight: i < 3 ? 'bold' : 'normal', color: i === 0 ? 'var(--secondary)' : 'var(--text-main)' }}>
                   {u.name} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '1rem', fontWeight: 'normal' }}>#{u.id}</span>
                 </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '800', fontFamily: 'JetBrains Mono, monospace', color: 'var(--primary)' }}>
+                <div style={{ marginRight: '2rem', textAlign: 'right' }}>
+                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Time</div>
+                   <div style={{ fontSize: '1rem', color: '#888' }}>{u.totalTimeTaken.toFixed(2)}s</div>
+                </div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '800', fontFamily: 'JetBrains Mono, monospace', color: 'var(--primary)', textAlign: 'right', minWidth: '80px' }}>
                   {u.score}
                 </div>
               </div>
