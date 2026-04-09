@@ -206,7 +206,7 @@ export default function Admin() {
                 <strong>Note:</strong> Participants will remain on the current question until you push the next one.
               </p>
               <a 
-                href={`http://localhost:1557/admin/export-report?key=${localStorage.getItem('adminKey')}`}
+                href={`https://kbc-3-0-csss.onrender.com/admin/export-report?key=${localStorage.getItem('adminKey')}`}
                 download
                 className="neo-button"
                 style={{ width: '100%', fontSize: '0.8rem', background: 'var(--primary)', color: '#000', textAlign: 'center', textDecoration: 'none', display: 'block' }}
