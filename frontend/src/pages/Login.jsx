@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { User, Shield, Terminal } from 'lucide-react';
-
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:1557' 
-  : 'https://kbc-3-0-csss.onrender.com';
+import { Terminal } from 'lucide-react';
 
 export default function Login() {
   const [teamId, setTeamId] = useState('');
@@ -18,7 +14,7 @@ export default function Login() {
     if(!teamId || !teamName) return;
     setLoading(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/register`, { id: teamId, name: teamName });
+      const response = await axios.post('https://kbc-3-0-csss.onrender.com/register', { id: teamId, name: teamName });
       // const response = await axios.post('http://localhost:1557/register', { id: teamId, name: teamName });
       const { token } = response.data;
       localStorage.setItem('participantId', teamId);

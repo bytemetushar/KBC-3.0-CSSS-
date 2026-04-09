@@ -1,7 +1,9 @@
-const SOCKET_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:1557' 
-  : 'https://kbc-3-0-csss.onrender.com';
+import { io } from 'socket.io-client';
 
-export const socket = io(SOCKET_URL, {
+// 'http://localhost:3001' is our backend server
+// export const socket = io('http://localhost:1557', {
+//   autoConnect: false // We will connect manually upon login or loading leaderboard
+// });
+export const socket = io('https://kbc-3-0-csss.onrender.com', {
   autoConnect: false // We will connect manually upon login or loading leaderboard
 });

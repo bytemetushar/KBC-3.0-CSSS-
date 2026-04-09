@@ -4,10 +4,6 @@ import { socket } from '../socket';
 import { Terminal, Lock, ChevronRight, Activity, Users, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:1557' 
-  : 'https://kbc-3-0-csss.onrender.com';
-
 export default function Admin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [key, setKey] = useState('');
@@ -24,7 +20,7 @@ export default function Admin() {
       verifyKey(storedKey);
     }
 
-    axios.get(`${API_BASE_URL}/questions`).then(res => {
+    axios.get('https://kbc-3-0-csss.onrender.com/questions').then(res => {
       setQuestions(res.data);
     });
 
@@ -53,7 +49,7 @@ export default function Admin() {
   const verifyKey = async (inputKey) => {
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/admin/verify`, { key: inputKey });
+      const res = await axios.post('https://kbc-3-0-csss.onrender.com/admin/verify', { key: inputKey });
       if (res.data.success) {
         setIsAdmin(true);
         localStorage.setItem('adminKey', inputKey);
@@ -229,7 +225,7 @@ export default function Admin() {
                 <strong>Note:</strong> Participants will remain on the current question until you push the next one.
               </p>
               <a 
-                href={`${API_BASE_URL}/admin/export-report?key=${localStorage.getItem('adminKey')}`}
+                href={`https://kbc-3-0-csss.onrender.com/admin/export-report?key=${localStorage.getItem('adminKey')}`}
                 download
                 className="neo-button"
                 style={{ width: '100%', fontSize: '0.8rem', background: 'var(--primary)', color: '#000', textAlign: 'center', textDecoration: 'none', display: 'block' }}

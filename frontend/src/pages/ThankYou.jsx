@@ -3,10 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, Home, Award, BarChart3, Star } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE_URL = window.location.hostname === 'localhost' 
-  ? 'http://localhost:1557' 
-  : 'https://kbc-3-0-csss.onrender.com';
-
 export default function ThankYou() {
   const navigate = useNavigate();
   const [score, setScore] = useState(0);
@@ -21,7 +17,7 @@ export default function ThankYou() {
 
     // Fetch final score one last time
     const token = localStorage.getItem('token');
-    axios.get(`${API_BASE_URL}/participant/${participantId}`, {
+    axios.get(`https://kbc-3-0-csss.onrender.com/participant/${participantId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       setScore(res.data.score);
