@@ -7,6 +7,7 @@ import { Code, CheckCircle, XCircle } from 'lucide-react';
 export default function Contest() {
   const [questions, setQuestions] = useState([]);
   const [currentQIdx, setCurrentQIdx] = useState(0);
+  const [selectedOption, setSelectedOption] = useState('');
   const [results, setResults] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
   const [contestStarted, setContestStarted] = useState(false); // New state
@@ -96,6 +97,10 @@ export default function Contest() {
     }
   }, [participantId, navigate, isInitialized]);
 
+  useEffect(() => {
+    setSelectedOption('');
+  }, [currentQIdx]);
+
   // Check for completion
   useEffect(() => {
     if (questions.length > 0 && results[questions[questions.length - 1]?.id]) {
@@ -133,8 +138,8 @@ export default function Contest() {
   }, [currentQIdx, questions.length, results, contestStarted]);
 
   const submitAnswer = (val) => {
-    const currentAnswer = val || "TIMEOUT";
-    if(currentAnswer === "TIMEOUT" && val !== "TIMEOUT") return;
+    const currentAnswer = val === "TIMEOUT" ? "TIMEOUT" : selectedOption;
+    if(currentAnswer !== "TIMEOUT" && !currentAnswer) return;
     
     const q = questions[currentQIdx];
     socket.emit('submit_answer', {
@@ -252,37 +257,57 @@ export default function Contest() {
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                {q.options && q.options.map((opt, idx) => (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
+                  {q.options && q.options.map((opt, idx) => {
+                    const isSelected = selectedOption === opt;
+                    return (
+                      <button 
+                        key={idx}
+                        className="neo-button"
+                        style={{ 
+                          textAlign: 'left', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '1rem',
+                          height: 'auto',
+                          padding: '1.25rem',
+                          background: isSelected ? 'rgba(0, 255, 204, 0.15)' : 'transparent',
+                          borderColor: isSelected ? 'var(--primary)' : 'var(--border-color)',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onClick={() => setSelectedOption(opt)}
+                      >
+                        <span style={{ 
+                          background: isSelected ? 'var(--primary)' : 'rgba(0,255,204,0.1)', 
+                          color: isSelected ? '#000' : 'var(--primary)', 
+                          width: '24px', 
+                          height: '24px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          borderRadius: '4px',
+                          fontSize: '0.8rem',
+                          fontWeight: isSelected ? 'bold' : 'normal',
+                          transition: 'all 0.2s ease'
+                        }}>
+                          {String.fromCharCode(65 + idx)}
+                        </span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div style={{ textAlign: 'center' }}>
                   <button 
-                    key={idx}
-                    className="neo-button"
-                    style={{ 
-                      textAlign: 'left', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '1rem',
-                      height: 'auto',
-                      padding: '1.25rem'
-                    }}
-                    onClick={() => submitAnswer(opt)}
+                    className="neo-button" 
+                    style={{ background: 'var(--primary)', color: '#000', padding: '1rem 3rem', fontSize: '1.1rem' }}
+                    onClick={() => submitAnswer()}
+                    disabled={!selectedOption}
                   >
-                    <span style={{ 
-                      background: 'rgba(0,255,204,0.1)', 
-                      color: 'var(--primary)', 
-                      width: '24px', 
-                      height: '24px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      borderRadius: '4px',
-                      fontSize: '0.8rem'
-                    }}>
-                      {String.fromCharCode(65 + idx)}
-                    </span>
-                    {opt}
+                    SUBMIT ANSWER
                   </button>
-                ))}
+                </div>
               </div>
             )}
           </div>
