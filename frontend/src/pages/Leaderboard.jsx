@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { socket } from '../socket';
-import { Trophy, Medal, Award } from 'lucide-react';
+import { Trophy, Medal, Award, ArrowLeft, RefreshCw } from 'lucide-react';
+
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:1557' 
+  : 'https://kbc-3-0-csss.onrender.com';
 
 export default function Leaderboard() {
   const [leaders, setLeaders] = useState([]);
 
   useEffect(() => {
     // Initial fetch
-    axios.get('https://kbc-3-0-csss.onrender.com/leaderboard').then(res => {
+    axios.get(`${API_BASE_URL}/leaderboard`).then(res => {
       setLeaders(res.data);
     });
     // axios.get('http://localhost:1557/leaderboard').then(res => {

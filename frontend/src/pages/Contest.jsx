@@ -4,6 +4,10 @@ import axios from 'axios';
 import { socket } from '../socket';
 import { Code, CheckCircle, XCircle } from 'lucide-react';
 
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:1557' 
+  : 'https://kbc-3-0-csss.onrender.com';
+
 export default function Contest() {
   const [questions, setQuestions] = useState([]);
   const [currentQIdx, setCurrentQIdx] = useState(0);
@@ -26,13 +30,13 @@ export default function Contest() {
     socket.connect();
 
     // Fetch questions
-    axios.get('https://kbc-3-0-csss.onrender.com/questions').then(res => {
+    axios.get(`${API_BASE_URL}/questions`).then(res => {
       setQuestions(res.data);
     });
 
     // Fetch participant status to restore session
     const token = localStorage.getItem('token');
-    axios.get(`https://kbc-3-0-csss.onrender.com/participant/${participantId}`, {
+    axios.get(`${API_BASE_URL}/participant/${participantId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       const history = {};
