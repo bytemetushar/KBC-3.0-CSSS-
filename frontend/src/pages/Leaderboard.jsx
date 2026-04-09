@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { socket } from '../socket';
-import { Trophy, Medal, Award, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Trophy, ArrowLeft, RefreshCw } from 'lucide-react';
 
 const API_BASE_URL = window.location.hostname === 'localhost' 
   ? 'http://localhost:1557' 
