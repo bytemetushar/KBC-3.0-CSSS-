@@ -1,3 +1,5 @@
+import { io } from 'socket.io-client';
+
 const SOCKET_URL = window.location.hostname === 'localhost' 
   ? 'http://localhost:1557' 
   : 'https://kbc-3-0-csss.onrender.com';
