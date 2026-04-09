@@ -155,12 +155,12 @@ const questions = [
   correctAnswer: 'Return type issue'
 },
 {
-  id: 'e10',
+  id: 'cx8',
   title: 'Predict Output',
   type: 'output',
-  code: '#include <stdio.h>\nint main() {\n  printf("%c", 65);\n  return 0;\n}',
-  options: ['A', '65', 'Error', 'a'],
-  correctAnswer: 'A'
+  code: '#include <stdio.h>\nint main() {\n  int i=5,j=1;\n  for(i=5;i>0;i--){\n    j+=i;\n  }\n  printf("%d",j);\n  return 0;\n}',
+  options: ['16', '15', '11', 'Error'],
+  correctAnswer: '16'
 },
 {
   id: 'e4',
@@ -201,6 +201,14 @@ const questions = [
   code: '#include <stdio.h>\nint main() {\n  int a = 10;\n  printf("%d", a - 3);\n  return 0;\n}',
   options: ['7', '13', '10', '3'],
   correctAnswer: '7'
+},
+{
+  id: 'cx12',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a=1,b=2,c=3;\n  a += b *= c -= 1;\n  printf("%d %d %d",a,b,c);\n  return 0;\n}',
+  options: ['5 4 2', '3 2 1', '7 4 2', 'Error'],
+  correctAnswer: '5 4 2'
 },
 
 
