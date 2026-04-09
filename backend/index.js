@@ -42,38 +42,168 @@ db.serialize(() => {
 });
 
 const questions = [
-  { 
-    id: 'q1', 
-    title: 'Find the Bug', 
-    type: 'bug', 
-    code: 'function add(a, b) {\n  return a - b; // Should be addition\n}', 
-    options: ['+', '*', '/', '&&'],
-    correctAnswer: '+' 
-  },
-  { 
-    id: 'q2', 
-    title: 'Predict Output', 
-    type: 'output', 
-    code: 'console.log(typeof null);', 
-    options: ['null', 'object', 'undefined', 'string'],
-    correctAnswer: 'object' 
-  },
-  { 
-    id: 'q3', 
-    title: 'Find the Bug', 
-    type: 'bug', 
-    code: 'let x = 10;\nif (x = 5) {\n  console.log("x is 5");\n}', 
-    options: ['==', '===', '!=', '!=='],
-    correctAnswer: '==' 
-  },
-  { 
-    id: 'q4', 
-    title: 'Predict Output', 
-    type: 'output', 
-    code: 'console.log(0.1 + 0.2 === 0.3);', 
-    options: ['true', 'false', 'undefined', 'Error'],
-    correctAnswer: 'false' 
-  },
+
+/* ================= EASY LEVEL ================= */
+
+{
+  id: 'q1',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  printf("%d", 2+3*2);\n  return 0;\n}',
+  options: ['10', '8', '7', '12'],
+  correctAnswer: '8'
+},
+{
+  id: 'q2',
+  title: 'Find the Bug',
+  type: 'bug',
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%f", a);\n  return 0;\n}',
+  options: ['%d', '%c', '%p', '%s'],
+  correctAnswer: '%d'
+},
+{
+  id: 'q3',
+  title: 'Concept Check',
+  type: 'concept',
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%d", sizeof(a));\n  return 0;\n}',
+  options: ['2', '4', 'Depends on compiler', '8'],
+  correctAnswer: 'Depends on compiler'
+},
+{
+  id: 'q4',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%d", a++);\n  return 0;\n}',
+  options: ['6', '5', 'Error', 'Undefined'],
+  correctAnswer: '5'
+},
+
+/* ================= MEDIUM LEVEL ================= */
+
+{
+  id: 'm1',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  printf("%d", printf("Hi"));\n  return 0;\n}',
+  options: ['Hi2', '2Hi', 'Hi', 'Error'],
+  correctAnswer: 'Hi2'
+},
+{
+  id: 'm2',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%d", ++a);\n  return 0;\n}',
+  options: ['5', '6', 'Error', 'Undefined'],
+  correctAnswer: '6'
+},
+{
+  id: 'm3',
+  title: 'Find the Bug',
+  type: 'bug',
+  code: '#include <stdio.h>\nint main() {\n  int arr[3] = {1,2,3};\n  printf("%d", arr[3]);\n  return 0;\n}',
+  options: ['Index out of bounds', 'Syntax error', 'No error', 'Logic error'],
+  correctAnswer: 'Index out of bounds'
+},
+{
+  id: 'm4',
+  title: 'Concept Check',
+  type: 'concept',
+  code: '#include <stdio.h>\nint main() {\n  int x = 5;\n  printf("%d", sizeof(x++));\n  return 0;\n}',
+  options: ['x becomes 6', 'x becomes 5', 'Error', 'Undefined'],
+  correctAnswer: 'x becomes 5'
+},
+
+{
+  id: 'm5',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  int *p = &a;\n  printf("%d", *p);\n  return 0;\n}',
+  options: ['5', 'Address', 'Garbage', 'Error'],
+  correctAnswer: '5'
+},
+{
+  id: 'm6',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = -1;\n  printf("%u", a);\n  return 0;\n}',
+  options: ['-1', '0', 'Large positive number', 'Error'],
+  correctAnswer: 'Large positive number'
+},
+{
+  id: 'm7',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%d", a << 1);\n  return 0;\n}',
+  options: ['10', '5', '2', 'Error'],
+  correctAnswer: '10'
+},
+{
+   id: 'm8',
+  title: 'Find the Bug',
+  type: 'bug',
+  code: '#include <stdio.h>\nint main() {\n  int *p;\n  printf("%d", *p);\n  return 0;\n}',
+  options: ['Uninitialized pointer', 'Syntax error', 'No error', 'Logic error'],
+  correctAnswer: 'Uninitialized pointer'
+},
+
+{
+  id: 'e9',
+  title: 'Find the Bug',
+  type: 'bug',
+  code: '#include <stdio.h>\nvoid main() {\n  printf("Hello");\n}',
+  options: ['Return type issue', 'Syntax error', 'No error', 'Logic error'],
+  correctAnswer: 'Return type issue'
+},
+{
+  id: 'e10',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  printf("%c", 65);\n  return 0;\n}',
+  options: ['A', '65', 'Error', 'a'],
+  correctAnswer: 'A'
+},
+{
+  id: 'e4',
+  title: 'Concept Check',
+  type: 'concept',
+  code: '#include <stdio.h>\nint main() {\n  int a;\n  printf("%d", a);\n  return 0;\n}',
+  options: ['0', 'Garbage value', 'Error', '5'],
+  correctAnswer: 'Garbage value'
+},
+{
+  id: 'e5',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  printf("%d", 5 * 2);\n  return 0;\n}',
+  options: ['10', '7', '25', '5'],
+  correctAnswer: '10'
+},
+{
+  id: 'e6',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%d", a++);\n  return 0;\n}',
+  options: ['6', '5', 'Error', '0'],
+  correctAnswer: '5'
+},
+{
+  id: 'e7',
+  title: 'Concept Check',
+  type: 'concept',
+  code: '#include <stdio.h>\nint main() {\n  printf("%lu", sizeof(int));\n  return 0;\n}',
+  options: ['2', '4', 'Depends on system', '8'],
+  correctAnswer: 'Depends on system'
+},
+{
+  id: 'e8',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = 10;\n  printf("%d", a - 3);\n  return 0;\n}',
+  options: ['7', '13', '10', '3'],
+  correctAnswer: '7'
+},
+
+
 ];
 
 app.post('/register', async (req, res) => {
