@@ -10,6 +10,7 @@ export default function Admin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentQIdx, setCurrentQIdx] = useState(0);
+  const [contestStarted, setContestStarted] = useState(false); // New state
   const [questions, setQuestions] = useState([]);
   const navigate = useNavigate();
 
@@ -26,15 +27,22 @@ export default function Admin() {
     socket.connect();
     socket.on('init_active_question', (data) => {
       setCurrentQIdx(data.currentQIdx);
+      setContestStarted(data.contestStarted);
     });
 
     socket.on('question_update', (data) => {
       setCurrentQIdx(data.currentQIdx);
     });
 
+    socket.on('contest_started', (data) => {
+       setContestStarted(true);
+       setCurrentQIdx(data.currentQIdx);
+    });
+
     return () => {
       socket.off('init_active_question');
       socket.off('question_update');
+      socket.off('contest_started');
     };
   }, []);
 
@@ -53,6 +61,11 @@ export default function Admin() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStartContest = () => {
+    const adminKey = localStorage.getItem('adminKey');
+    socket.emit('admin_start_contest', { key: adminKey });
   };
 
   const handleNextQuestion = () => {
@@ -127,32 +140,49 @@ export default function Admin() {
             <h3 style={{ margin: 0 }}>Active Question State</h3>
           </div>
 
-          {currentQ && (
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-              <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Q{currentQIdx + 1} / {questions.length}</span>
-                <span style={{ opacity: 0.5 }}>ID: {currentQ.id}</span>
-              </div>
-              <h4 style={{ fontSize: '1.2rem', margin: '0 0 1rem 0' }}>{currentQ.title}</h4>
-              <pre style={{ background: '#000', padding: '1rem', borderRadius: '8px', fontSize: '0.9rem', color: '#888' }}>
-                <code>{currentQ.code}</code>
-              </pre>
+          {!contestStarted ? (
+            <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', border: '1px dashed var(--primary)' }}>
+              <Activity size={48} color="var(--primary)" style={{ marginBottom: '1rem', opacity: 0.5 }} />
+              <h3 style={{ color: 'var(--primary)' }}>CONTEST NOT STARTED</h3>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Participants are currently in the waiting lobby.</p>
+              <button 
+                className="neo-button" 
+                style={{ background: 'var(--primary)', color: '#000', padding: '1rem 3rem' }}
+                onClick={handleStartContest}
+              >
+                START SESSION NOW
+              </button>
             </div>
-          )}
+          ) : (
+            <>
+              {currentQ && (
+                <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                  <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Q{currentQIdx + 1} / {questions.length}</span>
+                    <span style={{ opacity: 0.5 }}>ID: {currentQ.id}</span>
+                  </div>
+                  <h4 style={{ fontSize: '1.2rem', margin: '0 0 1rem 0' }}>{currentQ.title}</h4>
+                  <pre style={{ background: '#000', padding: '1rem', borderRadius: '8px', fontSize: '0.9rem', color: '#888' }}>
+                    <code>{currentQ.code}</code>
+                  </pre>
+                </div>
+              )}
 
-          <div style={{ marginTop: '2.5rem', textAlign: 'center' }}>
-            <button 
-              className="neo-button" 
-              style={{ height: 'auto', padding: '1.5rem 3rem', fontSize: '1.2rem', background: 'var(--secondary)', color: '#000' }}
-              onClick={handleNextQuestion}
-              disabled={currentQIdx >= questions.length - 1}
-            >
-              PUSH NEXT QUESTION <ChevronRight style={{ marginLeft: '1rem' }} />
-            </button>
-            <p style={{ marginTop: '1rem', opacity: 0.5, fontSize: '0.9rem' }}>
-              Broadcasting to all connected participants
-            </p>
-          </div>
+              <div style={{ marginTop: '2.5rem', textAlign: 'center' }}>
+                <button 
+                  className="neo-button" 
+                  style={{ height: 'auto', padding: '1.5rem 3rem', fontSize: '1.2rem', background: 'var(--secondary)', color: '#000' }}
+                  onClick={handleNextQuestion}
+                  disabled={currentQIdx >= questions.length - 1}
+                >
+                  PUSH NEXT QUESTION <ChevronRight style={{ marginLeft: '1rem' }} />
+                </button>
+                <p style={{ marginTop: '1rem', opacity: 0.5, fontSize: '0.9rem' }}>
+                  Broadcasting to all connected participants
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="neo-panel" style={{ padding: '1.5rem' }}>

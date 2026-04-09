@@ -10,6 +10,7 @@ export default function Contest() {
   const [answer, setAnswer] = useState('');
   const [results, setResults] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
+  const [contestStarted, setContestStarted] = useState(false); // New state
   const [timeLeft, setTimeLeft] = useState(30);
   const navigate = useNavigate();
 
@@ -74,16 +75,24 @@ export default function Contest() {
     // Handle initial question index from server
     socket.on('init_active_question', (data) => {
       if (!isInitialized) {
-        console.log("Setting initial question from server:", data.currentQIdx);
+        console.log("Setting initial contest state:", data);
         setCurrentQIdx(data.currentQIdx);
+        setContestStarted(data.contestStarted);
         setIsInitialized(true);
       }
+    });
+
+    socket.on('contest_started', (data) => {
+      console.log("Contest has been started by Admin!");
+      setContestStarted(true);
+      setCurrentQIdx(data.currentQIdx);
     });
 
     return () => {
       socket.off('answer_result');
       socket.off('question_update');
       socket.off('init_active_question');
+      socket.off('contest_started');
       socket.disconnect();
     }
   }, [participantId, navigate, isInitialized]);
@@ -99,11 +108,10 @@ export default function Contest() {
     }
   }, [results, questions, navigate]);
 
-  // Removed: initial question index calculation based on history
-  // The Admin now controls which question is active for everyone globally.
-
   // Question Timer Logic
   useEffect(() => {
+    if (!contestStarted) return; // Only run timer if contest is active
+
     const qId = questions[currentQIdx]?.id;
     // Only run timer if not already answered and not on completed state
     if (questions.length > 0 && !results[qId]) {
@@ -123,7 +131,7 @@ export default function Contest() {
 
       return () => clearInterval(interval);
     }
-  }, [currentQIdx, questions.length, results]); // Added results to dependencies to clear timer on answer
+  }, [currentQIdx, questions.length, results, contestStarted]);
 
   const submitAnswer = (timeoutVal) => {
     const currentAnswer = timeoutVal === "TIMEOUT" ? "TIMEOUT" : answer;
@@ -138,13 +146,34 @@ export default function Contest() {
     setAnswer('');
   };
 
-  const nextQuestion = () => {
-    if(currentQIdx < questions.length - 1) {
-      setCurrentQIdx(prev => prev + 1);
-    }
-  };
+  if(!isInitialized || questions.length === 0) return <div style={{textAlign:'center', marginTop:'5rem', color: 'var(--primary)'}}>Initialising session...</div>;
 
-  if(questions.length === 0) return <div style={{textAlign:'center', marginTop:'5rem'}}>Loading questions...</div>;
+  if (!contestStarted) {
+    return (
+      <div className="animate-fade-in" style={{ maxWidth: '600px', margin: '10vh auto', textAlign: 'center' }}>
+        <div className="neo-panel" style={{ padding: '4rem 2rem' }}>
+          <div className="loader-container" style={{ marginBottom: '2rem' }}>
+            <div className="pulse-ring"></div>
+            <Code size={48} color="var(--primary)" className="animate-pulse" />
+          </div>
+          <h1 style={{ color: 'var(--primary)', letterSpacing: '2px', marginBottom: '1rem' }}>WAITING FOR HOST</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '2rem' }}>
+            Get ready {participantName}! The contest will begin shortly.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', opacity: 0.6 }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{questions.length}</div>
+              <small>QUESTIONS</small>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>30s</div>
+              <small>PER Q</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const q = questions[currentQIdx];
   const qResult = results[q.id];

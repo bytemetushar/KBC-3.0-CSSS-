@@ -16,6 +16,7 @@ const ADMIN_KEY = process.env.Admin_key || 'KBC_ADMIN_DEFAULT';
 
 let currentActiveQuestionIndex = 0; // Global state for common question progression
 let questionStartedAt = Date.now(); // Global timestamp for current question start
+let contestStarted = false; // Add state for contest status
 
 mongoose.connect(process.env.Mongo_url || process.env.mongo_url)
   .then(() => console.log('Connected to MongoDB'))
@@ -28,7 +29,7 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'https://kbc-3-0-csss.vercel.app',
+    origin: ['https://kbc-3-0-csss.vercel.app', 'http://localhost:5173'], // Added localhost for testing
     methods: ['GET', 'POST']
   }
 });
@@ -166,6 +167,8 @@ io.on('connection', (socket) => {
   console.log('Client connected');
 
   socket.on('submit_answer', async ({ participantId, questionId, answer }) => {
+    if (!contestStarted) return; // Prevent submissions if contest hasn't started
+
     console.log(`Submission received: Participant=${participantId}, Question=${questionId}, Answer="${answer}"`);
     const q = questions.find(q => q.id === questionId);
     if (!q) {
@@ -248,9 +251,19 @@ io.on('connection', (socket) => {
     console.log('Client disconnected');
   });
 
+  // Admin control: Start contest
+  socket.on('admin_start_contest', ({ key }) => {
+    if (key === ADMIN_KEY && !contestStarted) {
+      contestStarted = true;
+      questionStartedAt = Date.now();
+      console.log('Admin started the contest');
+      io.emit('contest_started', { currentQIdx: currentActiveQuestionIndex });
+    }
+  });
+
   // Admin control: Next question
   socket.on('admin_next_question', ({ key }) => {
-    if (key === ADMIN_KEY) {
+    if (key === ADMIN_KEY && contestStarted) {
       if (currentActiveQuestionIndex < questions.length - 1) {
         currentActiveQuestionIndex++;
         questionStartedAt = Date.now(); // Reset question timer
@@ -261,7 +274,10 @@ io.on('connection', (socket) => {
   });
 
   // Sync request for new/refreshing participants
-  socket.emit('init_active_question', { currentQIdx: currentActiveQuestionIndex });
+  socket.emit('init_active_question', { 
+    currentQIdx: currentActiveQuestionIndex,
+    contestStarted: contestStarted 
+  });
 });
 
 const PORT = process.env.PORT || 1557;

@@ -24,6 +24,13 @@ export default function ThankYou() {
     }).catch(err => {
       console.error("Failed to fetch final score", err);
     });
+    // axios.get(`http://localhost:1557/participant/${participantId}`, {
+    //   headers: { Authorization: `Bearer ${token}` }
+    // }).then(res => {
+    //   setScore(res.data.score);
+    // }).catch(err => {
+    //   console.error("Failed to fetch final score", err);
+    // });
   }, [participantId, navigate]);
 
   return (

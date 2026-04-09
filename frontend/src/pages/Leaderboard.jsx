@@ -11,6 +11,9 @@ export default function Leaderboard() {
     axios.get('https://kbc-3-0-csss.onrender.com/leaderboard').then(res => {
       setLeaders(res.data);
     });
+    // axios.get('http://localhost:1557/leaderboard').then(res => {
+    //   setLeaders(res.data);
+    // });
 
     socket.connect();
     socket.on('leaderboard_update', (data) => {
