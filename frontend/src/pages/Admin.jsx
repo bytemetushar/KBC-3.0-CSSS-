@@ -165,6 +165,25 @@ export default function Admin() {
                   <pre style={{ background: '#000', padding: '1rem', borderRadius: '8px', fontSize: '0.9rem', color: '#888' }}>
                     <code>{currentQ.code}</code>
                   </pre>
+                  {currentQ.options && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '1.5rem' }}>
+                      {currentQ.options.map((opt, idx) => (
+                        <div key={idx} style={{ 
+                          padding: '0.75rem', 
+                          background: 'rgba(255,255,255,0.05)', 
+                          borderRadius: '8px', 
+                          border: '1px solid var(--border-color)', 
+                          fontSize: '0.9rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
+                        }}>
+                          <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>{String.fromCharCode(65 + idx)}</span>
+                          <span style={{ opacity: 0.8 }}>{opt}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 

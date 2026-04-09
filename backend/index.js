@@ -42,10 +42,38 @@ db.serialize(() => {
 });
 
 const questions = [
-  { id: 'q1', title: 'Find the Bug', type: 'bug', code: 'function add(a, b) {\n  return a - b; // Should be addition\n}', correctAnswer: '+' },
-  { id: 'q2', title: 'Predict Output', type: 'output', code: 'console.log(typeof null);', correctAnswer: 'object' },
-  { id: 'q3', title: 'Find the Bug', type: 'bug', code: 'let x = 10;\nif (x = 5) {\n  console.log("x is 5");\n}', correctAnswer: '==' },
-  { id: 'q4', title: 'Predict Output', type: 'output', code: 'console.log(0.1 + 0.2 === 0.3);', correctAnswer: 'false' },
+  { 
+    id: 'q1', 
+    title: 'Find the Bug', 
+    type: 'bug', 
+    code: 'function add(a, b) {\n  return a - b; // Should be addition\n}', 
+    options: ['+', '*', '/', '&&'],
+    correctAnswer: '+' 
+  },
+  { 
+    id: 'q2', 
+    title: 'Predict Output', 
+    type: 'output', 
+    code: 'console.log(typeof null);', 
+    options: ['null', 'object', 'undefined', 'string'],
+    correctAnswer: 'object' 
+  },
+  { 
+    id: 'q3', 
+    title: 'Find the Bug', 
+    type: 'bug', 
+    code: 'let x = 10;\nif (x = 5) {\n  console.log("x is 5");\n}', 
+    options: ['==', '===', '!=', '!=='],
+    correctAnswer: '==' 
+  },
+  { 
+    id: 'q4', 
+    title: 'Predict Output', 
+    type: 'output', 
+    code: 'console.log(0.1 + 0.2 === 0.3);', 
+    options: ['true', 'false', 'undefined', 'Error'],
+    correctAnswer: 'false' 
+  },
 ];
 
 app.post('/register', async (req, res) => {
@@ -121,7 +149,7 @@ app.get('/admin/export-report', async (req, res) => {
 
 app.get('/questions', (req, res) => {
   // Exclude correct answer when sending to client
-  const clientQuestions = questions.map(q => ({ id: q.id, title: q.title, type: q.type, code: q.code }));
+  const clientQuestions = questions.map(q => ({ id: q.id, title: q.title, type: q.type, code: q.code, options: q.options }));
   res.json(clientQuestions);
 });
 

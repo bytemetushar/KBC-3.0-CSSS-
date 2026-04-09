@@ -7,7 +7,6 @@ import { Code, CheckCircle, XCircle } from 'lucide-react';
 export default function Contest() {
   const [questions, setQuestions] = useState([]);
   const [currentQIdx, setCurrentQIdx] = useState(0);
-  const [answer, setAnswer] = useState('');
   const [results, setResults] = useState({});
   const [isInitialized, setIsInitialized] = useState(false);
   const [contestStarted, setContestStarted] = useState(false); // New state
@@ -133,9 +132,9 @@ export default function Contest() {
     }
   }, [currentQIdx, questions.length, results, contestStarted]);
 
-  const submitAnswer = (timeoutVal) => {
-    const currentAnswer = timeoutVal === "TIMEOUT" ? "TIMEOUT" : answer;
-    if(!currentAnswer.trim() && timeoutVal !== "TIMEOUT") return;
+  const submitAnswer = (val) => {
+    const currentAnswer = val || "TIMEOUT";
+    if(currentAnswer === "TIMEOUT" && val !== "TIMEOUT") return;
     
     const q = questions[currentQIdx];
     socket.emit('submit_answer', {
@@ -143,7 +142,6 @@ export default function Contest() {
       questionId: q.id,
       answer: currentAnswer
     });
-    setAnswer('');
   };
 
   if(!isInitialized || questions.length === 0) return <div style={{textAlign:'center', marginTop:'5rem', color: 'var(--primary)'}}>Initialising session...</div>;
@@ -254,16 +252,37 @@ export default function Contest() {
                 </div>
               </div>
             ) : (
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <input 
-                  type="text" 
-                  className="neo-input" 
-                  placeholder={q.type === 'bug' ? 'Enter the fixed code snippet / operator' : 'Enter predicted output'}
-                  value={answer}
-                  onChange={e => setAnswer(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && submitAnswer()}
-                />
-                <button className="neo-button" onClick={submitAnswer}>Submit</button>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                {q.options && q.options.map((opt, idx) => (
+                  <button 
+                    key={idx}
+                    className="neo-button"
+                    style={{ 
+                      textAlign: 'left', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '1rem',
+                      height: 'auto',
+                      padding: '1.25rem'
+                    }}
+                    onClick={() => submitAnswer(opt)}
+                  >
+                    <span style={{ 
+                      background: 'rgba(0,255,204,0.1)', 
+                      color: 'var(--primary)', 
+                      width: '24px', 
+                      height: '24px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      borderRadius: '4px',
+                      fontSize: '0.8rem'
+                    }}>
+                      {String.fromCharCode(65 + idx)}
+                    </span>
+                    {opt}
+                  </button>
+                ))}
               </div>
             )}
           </div>
