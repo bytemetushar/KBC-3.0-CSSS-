@@ -215,15 +215,19 @@ const questions = [
 ];
 
 app.post('/register', async (req, res) => {
-  const { id, name } = req.body;
-  if(!id || !name) return res.status(400).json({ error: 'Missing id or name' });
+  const { id, name, branch, section, contactNumber } = req.body;
+  if(!id || !name || !branch || !section || !contactNumber) return res.status(400).json({ error: 'Missing required fields' });
    
   try {
     let participant = await Participant.findOne({ id });
     if (!participant) {
-      participant = new Participant({ id, name });
-      await participant.save();
+      participant = new Participant({ id, name, branch, section, contactNumber });
+    } else {
+      participant.branch = branch;
+      participant.section = section;
+      participant.contactNumber = contactNumber;
     }
+    await participant.save();
     
     // Generate JWT Token
     const token = jwt.sign({ id: participant.id, name: participant.name }, JWT_SECRET, { expiresIn: '7d' });
@@ -262,11 +266,14 @@ app.get('/admin/export-report', async (req, res) => {
         'Rank': index + 1,
         'Team ID': p.id,
         'Name': p.name,
+        'Branch': p.branch || 'N/A',
+        'Section': p.section || 'N/A',
+        'Contact Number': p.contactNumber || 'N/A',
         'Total Score': p.score,
         'Answers Summary': answerSummary,
         'Individual Submission Times': submissionTimeSummary,
         'Total Time Taken (s)': p.totalTimeTaken.toFixed(2),
-        'Registration Date': p.createdAt.toLocaleString()
+        'Registration Date': p.createdAt ? p.createdAt.toLocaleString() : 'N/A'
       };
     });
 
@@ -464,3 +471,4 @@ const PORT = process.env.PORT || 1557;
 server.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });
+
