@@ -311,7 +311,7 @@ export default function Contest() {
                       >
                         <span style={{ 
                           background: isSelected ? 'var(--primary)' : 'rgba(0,255,204,0.1)', 
-                          color: isSelected ? '#000' : 'var(--primary)', 
+                          color: isSelected ? '#ffffffff' : 'var(--primary)', 
                           width: '24px', 
                           height: '24px', 
                           display: 'flex', 

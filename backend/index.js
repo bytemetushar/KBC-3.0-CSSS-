@@ -90,12 +90,12 @@ const questions = [
   correctAnswer: 'Hi2'
 },
 {
-  id: 'm2',
+  id: 'q_logical1',
   title: 'Predict Output',
   type: 'output',
-  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%d", ++a);\n  return 0;\n}',
-  options: ['5', '6', 'Error', 'Undefined'],
-  correctAnswer: '6'
+  code: '#include <stdio.h>\nint main() {\n  int a = 0, b = 5;\n  a = b + 10 || b - 5;\n  printf("%d\\n", a);\n  return 0;\n}',
+  options: ['1', '0', '5', '10'],
+  correctAnswer: '1'
 },
 {
   id: 'm3',
@@ -146,14 +146,13 @@ const questions = [
   options: ['Uninitialized pointer', 'Syntax error', 'No error', 'Logic error'],
   correctAnswer: 'Uninitialized pointer'
 },
-
 {
-  id: 'e9',
-  title: 'Find the Bug',
-  type: 'bug',
-  code: '#include <stdio.h>\nvoid main() {\n  printf("Hello");\n}',
-  options: ['Return type issue', 'Syntax error', 'No error', 'Logic error'],
-  correctAnswer: 'Return type issue'
+  id: 'q_comma1',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\nint main() {\n  int a = 0;\n  printf("%d\\n", (a++, a*2));\n  printf("%d\\n", a);\n  return 0;\n}',
+  options: ['0 1', '1 1', '0 0', '2 1'],
+  correctAnswer: '0 1'
 },
 {
   id: 'cx8',
@@ -172,12 +171,12 @@ const questions = [
   correctAnswer: 'Garbage value'
 },
 {
-  id: 'e5',
+  id: 'q_operator1',
   title: 'Predict Output',
   type: 'output',
-  code: '#include <stdio.h>\nint main() {\n  printf("%d", 5 * 2);\n  return 0;\n}',
-  options: ['10', '7', '25', '5'],
-  correctAnswer: '10'
+  code: '#include <stdio.h>\nint main() {\n  int a = 5, b = 3;\n  printf("%d\\n", a+++b);\n  return 0;\n}',
+  options: ['8', '9', 'Error', 'Undefined'],
+  correctAnswer: '8'
 },
 {
   id: 'e6',
@@ -188,20 +187,20 @@ const questions = [
   correctAnswer: '5'
 },
 {
-  id: 'e7',
-  title: 'Concept Check',
-  type: 'concept',
-  code: '#include <stdio.h>\nint main() {\n  printf("%lu", sizeof(int));\n  return 0;\n}',
-  options: ['2', '4', 'Depends on system', '8'],
-  correctAnswer: 'Depends on system'
-},
-{
-  id: 'e8',
+  id: 'q_macro1',
   title: 'Predict Output',
   type: 'output',
-  code: '#include <stdio.h>\nint main() {\n  int a = 10;\n  printf("%d", a - 3);\n  return 0;\n}',
-  options: ['7', '13', '10', '3'],
-  correctAnswer: '7'
+  code: '#include <stdio.h>\n#define SQUARE(x) x*x\nint main() {\n  printf("%d\\n", SQUARE(2+3));\n  return 0;\n}',
+  options: ['25', '11', '10', 'Error'],
+  correctAnswer: '11'
+},
+{
+  id: 'q_macro2',
+  title: 'Predict Output',
+  type: 'output',
+  code: '#include <stdio.h>\n#define MUL(a,b) a*b\nint main() {\n  printf("%d\\n", MUL(2+3, 4));\n  return 0;\n}',
+  options: ['20', '14', '24', 'Error'],
+  correctAnswer: '14'
 },
 {
   id: 'cx12',
