@@ -29,7 +29,7 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['https://kbc-3-0-csss.vercel.app', 'http://localhost:5173'], // Added localhost for testing
+    origin: 'https://kbc-3-0-csss.vercel.app', // Added localhost for testing
     // origin: 'http://localhost:5173', // Added localhost for testing
     methods: ['GET', 'POST']
   }
