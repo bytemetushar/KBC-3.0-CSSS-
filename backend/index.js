@@ -217,7 +217,7 @@ const questions = [
 app.post('/register', async (req, res) => {
   const { id, name } = req.body;
   if(!id || !name) return res.status(400).json({ error: 'Missing id or name' });
-  
+   
   try {
     let participant = await Participant.findOne({ id });
     if (!participant) {
