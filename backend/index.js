@@ -90,12 +90,12 @@ const questions = [
   correctAnswer: 'Hi2'
 },
 {
-  id: 'q_logical1',
+  id: 'm2',
   title: 'Predict Output',
   type: 'output',
-  code: '#include <stdio.h>\nint main() {\n  int a = 0, b = 5;\n  a = b + 10 || b - 5;\n  printf("%d\\n", a);\n  return 0;\n}',
-  options: ['1', '0', '5', '10'],
-  correctAnswer: '1'
+  code: '#include <stdio.h>\nint main() {\n  int a = 5;\n  printf("%d", ++a);\n  return 0;\n}',
+  options: ['5', '6', 'Error', 'Undefined'],
+  correctAnswer: '6'
 },
 {
   id: 'm3',
@@ -146,13 +146,14 @@ const questions = [
   options: ['Uninitialized pointer', 'Syntax error', 'No error', 'Logic error'],
   correctAnswer: 'Uninitialized pointer'
 },
+
 {
-  id: 'q_comma1',
-  title: 'Predict Output',
-  type: 'output',
-  code: '#include <stdio.h>\nint main() {\n  int a = 0;\n  printf("%d\\n", (a++, a*2));\n  printf("%d\\n", a);\n  return 0;\n}',
-  options: ['0 1', '1 1', '0 0', '2 1'],
-  correctAnswer: '0 1'
+  id: 'e9',
+  title: 'Find the Bug',
+  type: 'bug',
+  code: '#include <stdio.h>\nvoid main() {\n  printf("Hello");\n}',
+  options: ['Return type issue', 'Syntax error', 'No error', 'Logic error'],
+  correctAnswer: 'Return type issue'
 },
 {
   id: 'cx8',
@@ -171,12 +172,12 @@ const questions = [
   correctAnswer: 'Garbage value'
 },
 {
-  id: 'q_operator1',
+  id: 'e5',
   title: 'Predict Output',
   type: 'output',
-  code: '#include <stdio.h>\nint main() {\n  int a = 5, b = 3;\n  printf("%d\\n", a+++b);\n  return 0;\n}',
-  options: ['8', '9', 'Error', 'Undefined'],
-  correctAnswer: '8'
+  code: '#include <stdio.h>\nint main() {\n  printf("%d", 5 * 2);\n  return 0;\n}',
+  options: ['10', '7', '25', '5'],
+  correctAnswer: '10'
 },
 {
   id: 'e6',
@@ -187,20 +188,20 @@ const questions = [
   correctAnswer: '5'
 },
 {
-  id: 'q_macro1',
-  title: 'Predict Output',
-  type: 'output',
-  code: '#include <stdio.h>\n#define SQUARE(x) x*x\nint main() {\n  printf("%d\\n", SQUARE(2+3));\n  return 0;\n}',
-  options: ['25', '11', '10', 'Error'],
-  correctAnswer: '11'
+  id: 'e7',
+  title: 'Concept Check',
+  type: 'concept',
+  code: '#include <stdio.h>\nint main() {\n  printf("%lu", sizeof(int));\n  return 0;\n}',
+  options: ['2', '4', 'Depends on system', '8'],
+  correctAnswer: 'Depends on system'
 },
 {
-  id: 'q_macro2',
+  id: 'e8',
   title: 'Predict Output',
   type: 'output',
-  code: '#include <stdio.h>\n#define MUL(a,b) a*b\nint main() {\n  printf("%d\\n", MUL(2+3, 4));\n  return 0;\n}',
-  options: ['20', '14', '24', 'Error'],
-  correctAnswer: '14'
+  code: '#include <stdio.h>\nint main() {\n  int a = 10;\n  printf("%d", a - 3);\n  return 0;\n}',
+  options: ['7', '13', '10', '3'],
+  correctAnswer: '7'
 },
 {
   id: 'cx12',
@@ -215,19 +216,15 @@ const questions = [
 ];
 
 app.post('/register', async (req, res) => {
-  const { id, name, branch, section, contactNumber } = req.body;
-  if(!id || !name || !branch || !section || !contactNumber) return res.status(400).json({ error: 'Missing required fields' });
-   
+  const { id, name } = req.body;
+  if(!id || !name) return res.status(400).json({ error: 'Missing id or name' });
+  
   try {
     let participant = await Participant.findOne({ id });
     if (!participant) {
-      participant = new Participant({ id, name, branch, section, contactNumber });
-    } else {
-      participant.branch = branch;
-      participant.section = section;
-      participant.contactNumber = contactNumber;
+      participant = new Participant({ id, name });
+      await participant.save();
     }
-    await participant.save();
     
     // Generate JWT Token
     const token = jwt.sign({ id: participant.id, name: participant.name }, JWT_SECRET, { expiresIn: '7d' });
@@ -266,14 +263,11 @@ app.get('/admin/export-report', async (req, res) => {
         'Rank': index + 1,
         'Team ID': p.id,
         'Name': p.name,
-        'Branch': p.branch || 'N/A',
-        'Section': p.section || 'N/A',
-        'Contact Number': p.contactNumber || 'N/A',
         'Total Score': p.score,
         'Answers Summary': answerSummary,
         'Individual Submission Times': submissionTimeSummary,
         'Total Time Taken (s)': p.totalTimeTaken.toFixed(2),
-        'Registration Date': p.createdAt ? p.createdAt.toLocaleString() : 'N/A'
+        'Registration Date': p.createdAt.toLocaleString()
       };
     });
 
@@ -434,20 +428,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Admin control: Show answer
-  socket.on('admin_show_answer', ({ key }) => {
-    if (key === ADMIN_KEY && contestStarted) {
-      const q = questions[currentActiveQuestionIndex];
-      if (q) {
-        console.log(`Admin showed answer for question index ${currentActiveQuestionIndex}`);
-        io.emit('show_correct_answer', { 
-          questionId: q.id, 
-          correctAnswer: q.correctAnswer 
-        });
-      }
-    }
-  });
-
   // Admin control: Next question
   socket.on('admin_next_question', ({ key }) => {
     if (key === ADMIN_KEY && contestStarted) {
@@ -471,4 +451,3 @@ const PORT = process.env.PORT || 1557;
 server.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });
-

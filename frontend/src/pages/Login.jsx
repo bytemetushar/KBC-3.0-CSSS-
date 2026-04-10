@@ -6,25 +6,16 @@ import { Terminal } from 'lucide-react';
 export default function Login() {
   const [teamId, setTeamId] = useState('');
   const [teamName, setTeamName] = useState('');
-  const [branch, setBranch] = useState('');
-  const [section, setSection] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if(!teamId || !teamName || !branch || !section || !contactNumber) return;
+    if(!teamId || !teamName) return;
     setLoading(true);
     try {
-      // const response = await axios.post('https://kbc-3-0-csss.onrender.com/register', { 
-      //  id: teamId, 
-      //  name: teamName,
-      //  branch,
-      //  section,
-      //  contactNumber
-      // });
-      const response = await axios.post('http://localhost:1557/register', { id: teamId, name: teamName, branch, section, contactNumber });
+      const response = await axios.post('https://kbc-3-0-csss.onrender.com/register', { id: teamId, name: teamName });
+      // const response = await axios.post('http://localhost:1557/register', { id: teamId, name: teamName });
       const { token } = response.data;
       localStorage.setItem('participantId', teamId);
       localStorage.setItem('participantName', teamName);
@@ -60,30 +51,6 @@ export default function Login() {
             className="neo-input" 
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
-            required
-          />
-          <input 
-            type="text" 
-            placeholder="Branch" 
-            className="neo-input" 
-            value={branch}
-            onChange={(e) => setBranch(e.target.value)}
-            required
-          />
-          <input 
-            type="text" 
-            placeholder="Section" 
-            className="neo-input" 
-            value={section}
-            onChange={(e) => setSection(e.target.value)}
-            required
-          />
-          <input 
-            type="tel" 
-            placeholder="Contact Number" 
-            className="neo-input" 
-            value={contactNumber}
-            onChange={(e) => setContactNumber(e.target.value)}
             required
           />
           <button type="submit" className="neo-button" disabled={loading} style={{ marginTop: '1rem' }}>

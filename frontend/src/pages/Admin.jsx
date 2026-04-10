@@ -187,17 +187,7 @@ export default function Admin() {
                 </div>
               )}
 
-              <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                <button 
-                  className="neo-button" 
-                  style={{ height: 'auto', padding: '1.5rem 2rem', fontSize: '1.2rem', background: 'transparent', color: 'var(--primary)', border: '1px solid var(--primary)' }}
-                  onClick={() => {
-                    const adminKey = localStorage.getItem('adminKey');
-                    socket.emit('admin_show_answer', { key: adminKey });
-                  }}
-                >
-                  SHOW ANSWER
-                </button>
+              <div style={{ marginTop: '2.5rem', textAlign: 'center' }}>
                 <button 
                   className="neo-button" 
                   style={{ height: 'auto', padding: '1.5rem 3rem', fontSize: '1.2rem', background: 'var(--secondary)', color: '#000' }}
@@ -206,8 +196,6 @@ export default function Admin() {
                 >
                   PUSH NEXT QUESTION <ChevronRight style={{ marginLeft: '1rem' }} />
                 </button>
-              </div>
-              <div style={{ textAlign: 'center' }}>
                 <p style={{ marginTop: '1rem', opacity: 0.5, fontSize: '0.9rem' }}>
                   Broadcasting to all connected participants
                 </p>

@@ -12,7 +12,6 @@ export default function Contest() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [contestStarted, setContestStarted] = useState(false); // New state
   const [timeLeft, setTimeLeft] = useState(30);
-  const [revealedAnswer, setRevealedAnswer] = useState(null);
   const navigate = useNavigate();
 
   const participantId = localStorage.getItem('participantId');
@@ -71,12 +70,6 @@ export default function Contest() {
     socket.on('question_update', (data) => {
       console.log("Admin pushed next question:", data.currentQIdx);
       setCurrentQIdx(data.currentQIdx);
-      setRevealedAnswer(null);
-    });
-
-    socket.on('show_correct_answer', (data) => {
-      console.log("Admin revealed answer:", data);
-      setRevealedAnswer(data);
     });
 
     // Handle initial question index from server
@@ -100,7 +93,6 @@ export default function Contest() {
       socket.off('question_update');
       socket.off('init_active_question');
       socket.off('contest_started');
-      socket.off('show_correct_answer');
       socket.disconnect();
     }
   }, [participantId, navigate, isInitialized]);
@@ -188,7 +180,6 @@ export default function Contest() {
 
   const q = questions[currentQIdx];
   const qResult = results[q.id];
-  const isRevealedForCurrent = revealedAnswer && q && revealedAnswer.questionId === q.id;
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '800px', margin: '2rem auto' }}>
@@ -247,28 +238,6 @@ export default function Contest() {
           </pre>
 
           <div style={{ marginTop: '2rem' }}>
-            {isRevealedForCurrent && (
-              <div style={{
-                padding: '1.5rem',
-                marginBottom: '1.5rem',
-                borderRadius: '8px',
-                background: 'rgba(34, 197, 94, 0.1)',
-                border: '1px solid var(--success)',
-                color: 'var(--success)',
-                textAlign: 'center',
-                fontWeight: 'bold',
-                fontSize: '1.2rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '1rem',
-                animation: 'fade-in 0.5s ease-out'
-              }}>
-                <CheckCircle size={24} />
-                Correct Answer: {revealedAnswer.correctAnswer}
-              </div>
-            )}
-            
             {qResult ? (
               <div style={{ 
                 padding: '1.5rem', 
@@ -311,7 +280,7 @@ export default function Contest() {
                       >
                         <span style={{ 
                           background: isSelected ? 'var(--primary)' : 'rgba(0,255,204,0.1)', 
-                          color: isSelected ? '#ffffffff' : 'var(--primary)', 
+                          color: isSelected ? '#000' : 'var(--primary)', 
                           width: '24px', 
                           height: '24px', 
                           display: 'flex', 

@@ -10,18 +10,6 @@ const ParticipantSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  branch: {
-    type: String,
-    required: true
-  },
-  section: {
-    type: String,
-    required: true
-  },
-  contactNumber: {
-    type: String,
-    required: true
-  },
   score: {
     type: Number,
     default: 0
