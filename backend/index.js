@@ -30,6 +30,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: ['https://kbc-3-0-csss.vercel.app', 'http://localhost:5173'], // Added localhost for testing
+    // origin: 'http://localhost:5173', // Added localhost for testing
     methods: ['GET', 'POST']
   }
 });
@@ -424,6 +425,20 @@ io.on('connection', (socket) => {
       questionStartedAt = Date.now();
       console.log('Admin started the contest');
       io.emit('contest_started', { currentQIdx: currentActiveQuestionIndex });
+    }
+  });
+
+  // Admin control: Show answer
+  socket.on('admin_show_answer', ({ key }) => {
+    if (key === ADMIN_KEY && contestStarted) {
+      const q = questions[currentActiveQuestionIndex];
+      if (q) {
+        console.log(`Admin showed answer for question index ${currentActiveQuestionIndex}`);
+        io.emit('show_correct_answer', { 
+          questionId: q.id, 
+          correctAnswer: q.correctAnswer 
+        });
+      }
     }
   });
 
